@@ -1,0 +1,459 @@
+name: yarrp_toolkit
+version: "0.1"
+author: Markus Maier <mmaier@sba-research.org>
+about: Parses yarrp output files
+args:
+  - INPUT:
+      help: Sets the input file to use
+      required: false
+      multiple: true
+      index: 1
+  - no_input:
+      help: Sets no input flag for postprocessing modules (mergeid)
+      short: n
+      long: no_input
+      takes_value: false
+  - line_count:
+      help: Sets the line count of the input file (only visual for the progress bar)
+      short: l
+      value_name: LINE_COUNT
+      long: line_count
+      takes_value: true
+  - file_limit:
+      help: Sets the maximum number of files
+      short: f
+      value_name: FILE_LIMIT
+      long: file_limit
+      takes_value: true
+  - verbose:
+      short: v
+      multiple: true
+      help: Sets the level of verbosity
+  - quiet:
+      short: q
+      long: quiet
+      help: Sets the console output to a minimum
+  - ipv4:
+      short: '4'
+      long: ipv4
+      help: Switches to IPv4 parsing
+subcommands:
+  - chunk:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Read and split prefix files to given length or amount of files
+      args:
+        - prefix_file:
+            short: p
+            long: prefix_file
+            help: Path to a file containing prefixes, will be added ignoring the set cutoff value
+            value_name: PREFIX_FILE
+            takes_value: true
+        - target_prefix:
+            short: t
+            long: target_prefix
+            required: true
+            help: Sets the prefix length to split less specific prefixes into
+            value_name: TARGET_PREFIX
+            takes_value: true
+        - ping_prefix:
+            short: x
+            long: ping_prefix
+            required: true
+            help: The actual prefix length used to measure, larger prefixes than this will be discarded
+            value_name: PING_PREFIX
+            takes_value: true
+        - output:
+            short: o
+            long: output
+            required: true
+            help: Path to the output directory to store chunk files in
+            value_name: OUTPUT_PATH
+            takes_value: true
+  - target:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Create target list from prefix chunk
+      args:
+        - prefix_length:
+            short: p
+            long: prefix_length
+            required: true
+            help: Target prefix length for output addresses
+            value_name: PREFIX_LENGTH
+            takes_value: true
+        - output:
+            short: o
+            long: output
+            required: true
+            help: Path to the output file list of addresses in
+            value_name: OUTPUT_FILE
+            takes_value: true
+        - seed:
+            short: s
+            long: seed
+            required: false
+            help: Seed for the RNG to generate addresses with
+            value_name: SEED
+            takes_value: true
+        - blocklist:
+            short: b
+            long: blocklist
+            required: false
+            help: Path to a blocklist containing prefixes to filter out
+            value_name: BLOCKLIST_PATH
+            takes_value: true
+  - merge:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Merge multiple files in to one output file
+      args:
+        - output:
+            short: o
+            long: output
+            required: true
+            help: Path to the output file list of addresses in
+            value_name: OUTPUT_FILE
+            takes_value: true
+  - reimagine:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Reads the input files and generates a list of targets not yet fully scanned
+      args:
+        - max_ttl:
+            short: m
+            long: max_ttl
+            required: true
+            help: Sets the max_ttl to search for
+            value_name: MAX_TTL
+            takes_value: true
+        - output:
+            short: o
+            long: output
+            required: true
+            help: Path to the output path to store addresses in
+            value_name: OUTPUT_PATH
+            takes_value: true
+  - stats:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Does some basic analysis on the given input files
+  - loops:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Builds all routes and does loop analysis
+      args:
+        - max_ttl:
+            short: u
+            long: max_ttl
+            required: true
+            help: Sets the max_ttl to search for
+            value_name: MAX_TTL
+            takes_value: true
+        - min_ttl:
+            short: l
+            long: min_ttl
+            required: true
+            help: Sets the min_ttl to search for
+            value_name: MIN_TTL
+            takes_value: true
+        - loop_output:
+            short: x
+            long: loop_output
+            required: true
+            help: Path to directory to store loop information to
+            value_name: LOOP_OUTPUT
+            takes_value: true
+        - only_full_loops:
+            short: y
+            long: only_full_loops
+            help: Filter for full loops (meaning all hops withing the loop are known)
+            takes_value: false
+        - imperiled_router_test:
+            short: i
+            long: imperiled_router_test
+            help: .id file to read routers from for imperiled testing
+            takes_value: true
+            value_name: ROUTER_FILE.ID
+            required: false
+        - imperiled_blocklist_prefixes:
+            short: b
+            long: imperiled_blocklist_prefixes
+            help: A list of prefixes of routers to ignore from imperiled testing
+            takes_value: true
+            value_name: BLOCKLIST_FILE
+            required: false
+  - mergeid:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Merges .id files
+      args:
+        - inputs:
+            help: Directories to merge from
+            required: true
+            multiple: true
+            index: 1
+        - output:
+            short: o
+            long: output
+            required: true
+            help: Path to the output directory to store chunk files in
+            value_name: OUTPUT_PATH
+            takes_value: true
+  - scatter:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Scatters Targets list
+      args:
+        - output:
+            short: o
+            long: output
+            required: true
+            help: Path to the output directory to store chunk files in
+            value_name: OUTPUT_PATH
+            takes_value: true
+        - bucket_prefix:
+            short: p
+            long: bucket_prefix
+            required: true
+            help: Prefix Length to sort and combine read prefixes into buckets for scattering
+            value_name: BUCKET_PREFIX
+            takes_value: true
+        - target_prefix:
+            short: t
+            long: target_prefix
+            required: true
+            help: Prefix length to reduce given prefixes to
+            value_name: TARGET_PREFIX
+            takes_value: true
+  - p50targets:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Generates Targets for the persistence50 scan based on a given prefix list
+      args:
+        - output:
+            short: o
+            long: output
+            required: true
+            help: Path to the output directory to store files in
+            value_name: OUTPUT_PATH
+            takes_value: true
+        - prefix_length:
+            short: p
+            long: prefix_length
+            required: true
+            value_name: PREFIX_LENGTH
+            takes_value: true
+        - base_seed:
+            short: b
+            long: base_seed
+            required: true
+            value_name: BASE_SEED
+            takes_value: true
+        - file_number:
+            short: f
+            long: file_number
+            required: true
+            value_name: FILE_NUMBER
+            takes_value: true
+  - postloopstats:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Does analysis on a given project, ignores Input on global input files
+      args:
+        - project_path:
+            short: p
+            long: project_path
+            help: path to project containing id files
+            takes_value: true
+            required: true
+            value_name: PROJECT_PATH
+        - target_list:
+            short: t
+            help: Create a target list of the previous shadowed nets, given path is output file
+            value_name: TARGET_LIST
+            takes_value: true
+        - target_number:
+            short: n
+            help: If creating target list, try to get up to N targets per unique loop, default = 5
+            value_name: N
+            takes_value: true
+        - target_take_all:
+            short: z
+            help: Ignore target number, take all
+            takes_value: false
+        - print_all:
+            short: a
+            help: Do not restrict the output
+            takes_value: false
+        - skip_densities:
+            short: s
+            help: Skip density calculation
+            takes_value: false
+        - routeviews:
+            short: r
+            long: routeviews
+            required: true
+            help: Path to the downloaded routeviews file
+            value_name: ROUTEVIEWS
+            takes_value: true
+        - persistent_loops:
+            short: l
+            long: persistent_loops
+            required: true
+            help: Path to the persistent_loops id file
+            value_name: LOOPS_FILE
+            takes_value: true
+        - persistent_routers:
+            short: k
+            long: persistent_routers
+            required: true
+            help: Path to the persistent_routers id file
+            value_name: ROUTER_FILE
+            takes_value: true
+  - imperiled:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Checks all found hops for a given router and adds them to the imperiled stack
+      args:
+        - router_file:
+            short: r
+            long: router_file
+            required: true
+            help: File containing all the found routers within loops
+            value_name: ROUTER_FILE
+            takes_value: true
+        - imperiled_directory:
+            short: i
+            long: imperiled_directory
+            required: true
+            help: Output directory to write all found imperiled nets to
+            value_name: IMPERILED_DIRECTORY
+            takes_value: true
+        - ttl_filter:
+            short: f
+            long: ttl_filter
+            value_name: TTL_FILTER
+            takes_value: true
+        - shadowed_nets:
+            short: k
+            long: shadowed_nets
+            value_name: SHADOWED_NETS
+            takes_value: true
+            help: Input file containing shadowed nets
+  - export:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Exports the done analysis to a given datasource
+      subcommands:
+        - es:
+            version: "0.1"
+            author: Markus Maier <mmaier@sba-research.org>
+            about: Exports done analysis to an elasticsearch cluster
+            args:
+              - host:
+                  short: h
+                  long: host
+                  required: true
+                  help: IP or DNS name of ElasticSearch cluster
+                  value_name: HOST
+                  takes_value: true
+              - port:
+                  short: p
+                  long: port
+                  required: false
+                  help: Port of ElasticSearch cluster
+                  value_name: PORT
+                  takes_value: true
+              - delete:
+                  short: d
+                  long: delete
+                  help: Delete existing indices
+                  takes_value: false
+              - max_ttl:
+                  short: u
+                  long: max_ttl
+                  required: true
+                  help: Sets the max_ttl to search for
+                  value_name: MAX_TTL
+                  takes_value: true
+              - min_ttl:
+                  short: l
+                  long: min_ttl
+                  required: true
+                  help: Sets the min_ttl to search for
+                  value_name: MIN_TTL
+                  takes_value: true
+  - p50analysis:
+      version: "0.1"
+      author: Markus Maier <mmaier@sba-research.org>
+      about: Analyses ZMAP files for the P50 scan
+      args:
+        - input_path:
+            short: i
+            long: input_path
+            required: true
+            help: Directory containing all the given zmap .zmp files
+            value_name: INPUT_PATH
+            takes_value: true
+        - output_path:
+            short: o
+            long: output_path
+            required: true
+            help: Path to write output csv to
+            value_name: OUTPUT_PATH
+            takes_value: true
+        - original_targets:
+            short: t
+            required: true
+            long: original_targets
+            help: Targets we used to scan
+            value_name: ORIGINAL_TARGETS
+            takes_value: true
+        - full_scan:
+            short: f
+            required: true
+            long: full_scan
+            help: Path to fullscan for loop destinations
+            value_name: FULL_SCAN
+            takes_value: true
+        - persistent_loops:
+            short: l
+            required: true
+            long: persistent_loops
+            help: Path to file containing persistent loops
+            value_name: PERSISTENT_LOOPS
+            takes_value: true
+        - file_limit:
+            short: u
+            required: false
+            long: file_limit
+            help: How many files are being read for various reasons (e.g. memory constraints)
+            value_name: FILE_LIMIT
+            takes_value: true
+        - skip_files:
+            short: y
+            required: false
+            long: skip_files
+            help: How many files are being skipped for processing
+            value_name: SKIP_FILES
+            takes_value: true
+  - asn:
+        version: "0.1"
+        author: Markus Maier <mmaier@sba-research.org>
+        about: reads txt file and attributes to asn
+        args:
+        - routeviews:
+              short: r
+              long: routeviews
+              required: true
+              help: Path to the downloaded routeviews file
+              value_name: ROUTEVIEWS
+              takes_value: true
+        - output:
+              short: o
+              long: output
+              required: true
+              help: Path to the output file to store ASN info in
+              value_name: OUTPUT_PATH
+              takes_value: true
